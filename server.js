@@ -1,4 +1,4 @@
-const app = require('./app');
+const app = require('./config/app');
 
 app.set('port' , process.env.port || 7777 );
 

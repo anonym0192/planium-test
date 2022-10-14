@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Aceitação de proposta</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' type='text/css' media='screen' href='/assets/css/bootstrap.min.css'>
+    <link rel='stylesheet' type='text/css' media='screen' href='/assets/css/main.css'>
+</head>
+<body>
+    <h1 class="text-success text-center">
+        Proposta de preços
+    </h1>
+
+    <div class="container">
+
+      <div class="alert d-none" id="alert" role="alert"></div>
+
+      <h2>Plano escolhido : <span id="planoEscolhido"></span></h2>
+        
+          <table class="table" id="tabelaDeBeneficiarios">
+              <thead class="thead-dark">
+                <tr>
+                  <th>Nome</th>
+                  <th>Idade</th>
+                  <th>Preço(R$)</th>
+                  <th>Faixa</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td>Valor Total:</td>
+                  <td id="total"></td>
+                </tr>
+              </tfoot>
+          </table>
+
+            <form class="card p-2" onsubmit="aceitarProposta(event)">
+              <div class="input-group">
+                <div class="input-group-append">
+                  <button type="submit" class="btn btn-primary rounded">Aceitar proposta</button>
+                  <button onclick="cancelarProposta()" class="btn btn-danger rounded mx-5">Cancelar</button>
+                </div>
+              </div>
+            </form>
+          </div>
+    </div>
+    
+    
+      
+
+    <script src="/assets/js/jquery-slim.min.js"></script>
+    <script src="/assets/js/popper.min.js"></script>
+    <script src="/assets/js/bootstrap.min.js"></script>
+    <script src='/assets/js/proposta.js'></script>
+    <script src='/assets/js/formulario.js'></script>
+  </body>
+</html>

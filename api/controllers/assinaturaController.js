@@ -1,77 +1,109 @@
-const beneficiarios = require('../data/beneficiarios.json');
-const planos = require('../data/plans.json');
-const precos = require('../data/prices.json');
 const uuid = require('uuid');
-const {atualizarArquivoJson} = require('../../utils');
+const beneficiarioModel = require('../models/beneficiarioModel');
+const planoModel = require('../models/planoModel');
+const propostaModel = require('../models/propostaModel');
 
-/*Pessoas de 0 a 17 anos vão para a faixa1.
-Pessoas de 18 a 40 anos vão para a faixa2.
-Pessoas com mais de 40 anos vão para a faixa3.
-
-Quantidade de beneficiários
-Idade de cada beneficiário
-Nome de cada beneficiário
-Registro do plano escolhido (deve ser um dos registros listados na tabela de plano)
-Caso o usuário liste um registro inexistente, deve mostrar mensagem de erro.
-*/
-exports.criarAssinatura = (req, res) => {
+exports.calcularAssinatura =  (req, res) => {
 
 
     let planoSelecionado = req.body.plano;
 
     let qtBeneficiarios = req.body.qtBeneficiarios
 
-    let beneficiarios = req.body.beneficiarios  || [];
+    let beneficiariosDados = req.body.beneficiarios;
+
     
-    console.log(precos);
-    //console.log(qtBeneficiarios)
+    /* Pega os dados do plano escolhido*/
+    const planoDados = planoModel.pegarPlanoPeloRegistro(planoSelecionado);
 
-    console.log(precos.filter((item) => item.codigo == planoSelecionado && item.minimo_vidas < qtBeneficiarios  ) );
+    /* Se o registro do plano for invalido retorna um json com mensagem de erro  */
+    if(!planoDados){
+        res.status(400).json({error: "Registro de Plano de saúde inválido!"})
+    }
+    if(!beneficiariosDados || beneficiariosDados.length < 1){
+        res.status(400).json({error: "Nenhum beneficiário enviado!"})
+    }
+    if(!qtBeneficiarios || qtBeneficiarios < 1){
+        res.status(400).json({error: "Quantidade de beneficiários não informada ou inválida!"})
+    }
 
-    beneficiarios.map((beneficiario  , index ) => {
-        console.log(beneficiario.nome+"\n");
-
-        if(beneficiario.idade < 18){
-
-
+    beneficiariosDados?.forEach((beneficiario) => {
+        if(!beneficiario.nome || !beneficiario.idade ){
+            res.status(400).json({error: "Não é permitido campos em branco!"})
         }
-
-        if(beneficiario.idade >= 18 && beneficiario.idade <= 40){
-            
-
-        }
-
-        if(beneficiario.idade > 40){
-
-
-        }
-
-
-
     });
     
-    /* Total de beneficiarios contando com o titular do plano
-    let totalBeneficiarios = dependentes.length + 1;
-    */
+    /* Pega os precos do plano de acordo com o codigo e com o numero de beneficiarios */
+
+    let precoDoPlano = planoModel.pegarTodosOsPrecos()?.filter((item) => item.codigo == planoDados.codigo &&  qtBeneficiarios >= item.minimo_vidas  )
+
+    /* Se não tiver nenhum plano que a condição minimo_vidas e com o mesmo código retorna uma mensagem de erro  */
+    if(!precoDoPlano || precoDoPlano.length < 1){
+        res.status(400).json({error: "Plano não disponível para essa quantidade de beneficiários"});
+    }
+
+    /* Escolhe o que tem o minimo_vidas mais alto e tem o mesmo codigo */
+    precoDoPlano = precoDoPlano.reduce((precoA, precoB) =>{ 
+                                    if(precoB.minimo_vidas >= precoA.minimo_vidas)  precoA = precoB; 
+                                    return precoA; 
+                            });
+
+    /* Percorre cada beneficiario no array e pega a faixa de preco de acordo com a idade */
+    beneficiariosDados = beneficiariosDados.map((beneficiario  , index ) => {
+            
+            if(beneficiario.idade < 18){
+                beneficiario.preco = precoDoPlano['faixa1'];
+                beneficiario.faixaDePreco = 'faixa1';
+
+            }else if(beneficiario.idade >= 18 && beneficiario.idade <= 40){
+                beneficiario.preco = precoDoPlano['faixa2'];
+                beneficiario.faixaDePreco = 'faixa2';
+
+            }else{
+                beneficiario.preco = precoDoPlano['faixa3'];
+                beneficiario.faixaDePreco = 'faixa3';
+            }
+
+            return beneficiario;
+
+        });
 
 
+    /* Calcula o total a pagar de acordo com o preço de cada um*/
+    const totalAPagar = beneficiariosDados.map((beneficiario => beneficiario.preco))
+        .reduce((valor1 , valor2 ) => valor1 + valor2);
     
 
-    //res.json([...titular, ...dependentes]);
-    res.json({ id: uuid.v4() , beneficiarios });
+    const beneficiarios = {id: uuid.v4() , beneficiariosDados, qtBeneficiarios , plano: planoSelecionado , total: totalAPagar };
+
+    /* Salva os dados no arquivo Json beneficiarios*/
+    beneficiarioModel.adicionarBeneficiarios(beneficiarios);
+
+
+    /* Retorna um json com dados e informação de proposta para os beneficiarios  */
+    res.json({...beneficiarios, nomeDoPlano: planoDados.nome});
 
 }
 
-exports.mudarAssinatura = (req, res) => {
+exports.aceitarProposta = (req, res) => {
+
+    const idDaProposta = req.body.idDaProposta;
 
 
-}
-
-exports.excluirAssinatura = (req, res) => {
+    const beneficiariosDaProposta = beneficiarioModel.acharListaDeBeneficiariosPeloId(idDaProposta);
 
 
-}
+    /* Pega os dados do plano escolhido */
+    
+    const dadosDoPlano = planoModel.pegarPlanos().find((plano) => plano.registro == beneficiariosDaProposta?.plano);
+        
+    
 
-const selectionarPrecoDoPlano = () => {
+    /* Junta todos os dados gera uma proposta e salva */
+    const proposta =  { id: uuid.v4() , planoInfo: dadosDoPlano , beneficiarios: beneficiariosDaProposta };
+
+    propostaModel.adicionarProposta(proposta);
+
+    res.json(proposta);
 
 }

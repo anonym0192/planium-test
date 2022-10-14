@@ -1,20 +1,26 @@
 const express =  require('express');
 const planoController = require('./api/controllers/planoController');
 const assinaturaController = require('./api/controllers/assinaturaController');
-//const usuarioController = require('./api/controllers/usuarioController');
+
 
 /* Definição de rotas */
 const router = express.Router();
 
+/* Rotas de páginas de teste front-end */
 router.get('/' , function( req, res ){
-
-    res.send('hellow world');
+    res.render('formulario');
 });
 
+router.get('/proposta' , function( req, res ){
+    res.render('proposta');
+});
+
+
+/* Rotas de API */
 router.get('/api/v1/planos' , planoController.mostrarPlanos );
 
-router.post('/api/v1/assinar' , assinaturaController.criarAssinatura );
+router.post('/api/v1/assinar' , assinaturaController.calcularAssinatura );
 
-router.put('/api/v1/assinatura' , assinaturaController.mudarAssinatura );
+router.post('/api/v1/proposta' , assinaturaController.aceitarProposta );
 
 module.exports = router;

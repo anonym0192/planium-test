@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Formulario de calculo beneficiarios</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' type='text/css' media='screen' href='/assets/css/main.css'>
+    <link rel='stylesheet' type='text/css' media='screen' href='/assets/css/bootstrap.min.css'>    
+</head>
+<body>
+
+    <h1 class="text-success text-center">
+        Formulario de contratação de plano
+    </h1>
+     
+    <h2 class="text-center">Preencha as informações abaixo</h2>
+     
+    <div class="container">
+        <form action="#" method="post" onsubmit="enviarDados(event)" class="mb-5 ">
+
+            <div class="alert d-none" id="alert" role="alert"></div>
+
+            <div class="jumbotron bg-dark text-white mt-5">
+                <label for="qtBeneficiarios">Selecione o Número de Beneficiarios o plano:</label>
+                <select class="form-control w-25 " onchange="mostrarCamposDeFormulario(event)" id="qtBeneficiarios" name="qtBeneficiarios">
+                    <option selected="selected">1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                    <option>6</option>
+                </select>
+
+                <label for="qtBeneficiarios">Selecione o plano:</label>
+                <select class="form-control w-75 " id="plano" name="plano"></select>
+            </div>
+            <div id="beneficiarios">
+                <div class="form-row">
+                    <div class="form-group col-md-9">
+                        <label for="nome1">Nome Completo:</label>
+                        <input type="text" class="form-control" id="nome1" name="nome1" required>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="idade1">Idade:</label>
+                        <input type="number" class="form-control" id="idade1" name="idade1" min="1" max="100" required>
+                    </div>
+                </div>
+            </div>
+            <hr class="mb-4">
+
+            <button type="submit" class="btn bg-primary px-3 mt-2 text-white">Enviar</button>
+        </div>  
+        </form>
+    </div>
+    
+    
+      
+
+    <script src="/assets/js/jquery-slim.min.js"></script>
+    <script src="/assets/js/popper.min.js"></script>
+    <script src="/assets/js/bootstrap.min.js"></script>
+    <script src='/assets/js/formulario.js'></script>
+    
+</body>
+</html>

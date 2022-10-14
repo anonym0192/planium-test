@@ -4,35 +4,24 @@ const fs = require('fs');
 
 test("testar funcao atualizarArquivoJson", async () => {
 
-    let fileTest = [{'teste': 1} , {'teste': 2 }];
+    let testMockObject = [{'teste': 1} , {'teste': 4 }];
  
-    filepathname = 'tests/unit/utilsDataTest.json';
+    const filepathname = 'tests/unit/utilsDataTest.json';
 
     
-    fs.writeFile(filepathname, JSON.stringify(fileTest) ,  (err) => {
-        if (err) throw err;
-    });
+    fs.writeFileSync(filepathname, JSON.stringify(testMockObject) , {encoding: 'utf-8'});
 
-    const newData = [...fileTest, {'teste': 3}, {'teste': 4}];
+    const newData = [...testMockObject, {'teste': 3}, {'teste': 4}];
 
     atualizarArquivoJson(filepathname , newData );
 
 
-    fs.readFile(filepathname, 'utf8', (err, changedFile) => {
-        if (err) {
-            console.log("Error reading file from disk:", err)
-            return
-        }
-           // const result = JSON.parse(changedFile)
+    const changedFile = fs.readFileSync(filepathname, 'utf-8');
 
-           // console.log("dsdss");
+    const changedFileObject = JSON.parse(changedFile);
 
-            expect(newData).toMatchObject(changedFile);
+    expect(changedFileObject).toMatchObject(newData);
 
-            fs.unlink(filepathname,function(err){
-                if (err) throw err;
-            }); 
-
-    });
+    fs.unlinkSync(filepathname);
     
 });
